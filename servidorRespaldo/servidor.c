@@ -40,8 +40,10 @@ int * enviar_bloque_2_2_svc(bloque2 *argp, struct svc_req *rqstp) {
 	FILE *file;
 	//abrimos el archivo en modo añadir a -> agrega contenido al final  
 	int len = strlen("canciones/");
-    char *ruta = malloc(len + strlen(argp) + 1);
+    // char *ruta = malloc(len + strlen(argp) + 1);
+	char *ruta = malloc(100);
     sprintf(ruta, "canciones/%s", (*argp).nombreArchivo);
+	// sprintf(ruta, "canciones/%s", "all_of_me_4917008.mp3");
 
 	file = fopen(ruta, "a");
 	if(file == NULL){
@@ -62,29 +64,20 @@ int * enviar_bloque_2_2_svc(bloque2 *argp, struct svc_req *rqstp) {
 	else if((*argp).datos.datos_len < TAM_MAX_BLOQUE_ARCHIVO){
 		printf("\n Último bloque recibido exitosamente");
 		printf("\n Número de bloques recibidos: %d", tamanio_bloques);
+
+		//renombramiento de la cancion 
+		//ruta inicial de la cancion 
+		int len2 = strlen("canciones/");
+		char *ruta2 = malloc(100);
+		sprintf(ruta2, "canciones/%s", (*argp).nombreArchivo);
+		//renombramiento 
+		int len_ruta = strlen("canciones/copiaSeguridad_");
+		char *ruta_renombrada = malloc(100);
+		sprintf(ruta_renombrada, "canciones/copiaSeguridad_%s", (*argp).nombreArchivo);
+		//concatenacion para el nombre nuevo de la cancion 
+		rename(ruta2, ruta_renombrada);
+
 	}
-
-	//renombramiento de la cancion 
-	// int n1 = tamanio_cancion;
-	// char *num;
-	// char buffer[100];
-	// //convertimos un int a char 
-	// if (asprintf(&num, "_%d", n1) == -1) {
-	// 	perror("No se pudo hacer la coherción de tipo");
-	// } else {
-	// 	//ruta inicial de la cancion 
-	// 	int len2 = strlen("canciones/");
-	// 	char *ruta2 = malloc(len2 + strlen(argp) + 1);
-	// 	sprintf(ruta2, "canciones/%s", (*argp).nombreArchivo);
-	// 	//split para el nombre de la cancion 
-	// 	char delimitador[] = ".";
-	// 	char *token = strtok(ruta, delimitador);
-	// 	//concatenacion para el nombre nuevo de la cancion 
-	// 	strcat(token, num);
-	// 	strcat(token, ".mp3");
-	// 	rename(ruta2, token);
-	// 	free(num);
-	// }
-
+	
 	return &result;
 }

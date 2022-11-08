@@ -55,14 +55,13 @@ const char * get_filename_ext(const char *filename) {
  */
 void enviarArchivoAlServidor(char * nombreArchivo, CLIENT  *clnt){
 
-	printf("\n nombre:");
 
 	//fopen abrimos el archivo en modo lectura r 
 	FILE *file = fopen(nombreArchivo, "r");
 	bool bandera = TRUE; 
 	int pos = 0, cantidadBloques = 0; 
-	bloque2 objBloque; 
-	objBloque.nombreArchivo = (char*)malloc(20*sizeof(char));
+	bloque1 objBloque; 
+	objBloque.nombreArchivo = (char*)malloc(40*sizeof(char));
 	strcpy(objBloque.nombreArchivo, nombreArchivo);
 	objBloque.datos.datos_val = (char *)malloc(TAM_MAX_BLOQUE_ARCHIVO * sizeof(char));
 
@@ -187,6 +186,32 @@ int * enviar_bloque_1_1_svc(bloque1 *argp, struct svc_req *rqstp) {
 		printf("\n Último bloque recibido exitosamente");
 		printf("\n Número de bloques recibidos: %d", tamanio_bloques);
 		
+		//renombramiento de la cancion 
+		int n1 = tamanio_cancion;
+		char *num;
+		char buffer[100];
+		int len2 = strlen("canciones/");
+    	char *ruta2 = malloc(len2 + strlen(argp) + 1);
+		char *nombreCancion = malloc(len2 + strlen(argp) + 1); 
+
+		//convertimos un int a char 
+		if (asprintf(&num, "_%d", n1) == -1) {
+			perror("No se pudo hacer la coherción de tipo");
+		} else {
+			//ruta inicial de la cancion 
+    		sprintf(ruta2, "canciones/%s", (*argp).nombreArchivo);
+			//split para el nombre de la cancion 
+			char delimitador[] = ".";
+			char *token = strtok(ruta, delimitador);
+			//concatenacion para el nombre nuevo de la cancion 
+			strcat(token, num);
+			strcat(token, ".mp3");
+			nombreCancion = "all_of_me_4917008.mp3";
+			// nombreCancion = token;
+			rename(ruta2, token);
+			free(num);
+		}
+
 		//Si el archivo se recibió exitosamente hacemos una copia de seguridad en el servidor 
 		//de respaldo 
 		
@@ -196,8 +221,11 @@ int * enviar_bloque_1_1_svc(bloque1 *argp, struct svc_req *rqstp) {
 		int  *result_2;
 		bloque2  enviar_bloque_2_2_arg;
 		//reservo memoria 
-		crear_archivo_2_2_arg = (char*)malloc(20*sizeof(char));
-		crear_archivo_2_2_arg = (*argp).nombreArchivo;
+		crear_archivo_2_2_arg = (char*)malloc(40*sizeof(char));
+		// crear_archivo_2_2_arg = (*argp).nombreArchivo;
+		printf("\n ruta2 : %s", nombreCancion);
+		crear_archivo_2_2_arg = "all_of_me_4917008.mp3";
+		
 
 		#ifndef	DEBUG
 			clnt = clnt_create ("localhost", programa_compartir_canciones, programa_compartir_canciones_version_2, "tcp");
@@ -228,27 +256,6 @@ int * enviar_bloque_1_1_svc(bloque1 *argp, struct svc_req *rqstp) {
 			clnt_destroy (clnt);
 		#endif	 /* DEBUG */
 
-		//renombramiento de la cancion 
-		int n1 = tamanio_cancion;
-		char *num;
-		char buffer[100];
-		//convertimos un int a char 
-		if (asprintf(&num, "_%d", n1) == -1) {
-			perror("No se pudo hacer la coherción de tipo");
-		} else {
-			//ruta inicial de la cancion 
-			int len2 = strlen("canciones/");
-    		char *ruta2 = malloc(len2 + strlen(argp) + 1);
-    		sprintf(ruta2, "canciones/%s", (*argp).nombreArchivo);
-			//split para el nombre de la cancion 
-			char delimitador[] = ".";
-			char *token = strtok(ruta, delimitador);
-			//concatenacion para el nombre nuevo de la cancion 
-			strcat(token, num);
-			strcat(token, ".mp3");
-			rename(ruta2, token);
-			free(num);
-		}
 	}
 	return &result;
 }
