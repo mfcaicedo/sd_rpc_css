@@ -12,7 +12,7 @@ int dest_offset;
 typedef struct bloque2 bloque2;
 
 /*Definicion de las operaciones que se pueden realizar*/
-program programa_compartir_canciones {
+program programa_compartir_canciones2 {
 	version programa_compartir_canciones_version_2 {
 		int crear_archivo_2(string archivo) = 1;
 		int enviar_bloque_2(bloque2 *) = 2;	

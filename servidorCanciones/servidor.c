@@ -11,6 +11,7 @@
 #include <stdbool.h>
 #include "interface1.h"
 #include "interface2.h"
+#include "interface3.h"
 cancion1 vectorCanciones[20];
 int indice = 0;
 struct stat st; 
@@ -91,6 +92,23 @@ void enviarArchivoAlServidor(char * nombreArchivo, CLIENT  *clnt){
 	}else{
 		printf("\n Error al enviar la canción");
 	}
+}
+/**
+ * @brief Método para enviar la notificacion al servidor de logs. 
+ * 
+ */
+void enviarNotificacion(){
+	printf("\n llego a enviar notificacion");
+	//TODO hacer calcular 
+	//1. calcular la cantidad de canciones segun el tipo 
+	// for (size_t i = 0; i < 5; i++){
+	// 	printf("\nNombre: %s", vectorCanciones[i].titulo);
+	// 	printf("\nArtista: %s", vectorCanciones[i].artista);
+	// }
+	
+	//2. calcular el espacio utilizado por todas las canciones 
+
+
 }
 
 /**
@@ -206,10 +224,20 @@ int * enviar_bloque_1_1_svc(bloque1 *argp, struct svc_req *rqstp) {
 			//concatenacion para el nombre nuevo de la cancion 
 			strcat(token, num);
 			strcat(token, ".mp3");
-			nombreCancion = "all_of_me_4917008.mp3";
-			// nombreCancion = token;
 			rename(ruta2, token);
 			free(num);
+			//formateo el nombre de la cancion para enviar al servidor de respaldo
+			char delimitador_formato[] = "/";
+			char *nombreFormateado = strtok(token, delimitador_formato);
+			if(nombreFormateado != NULL){
+				// Sólo en la primera pasamos la cadena; en las siguientes pasamos NULL
+				nombreFormateado = strtok(NULL, delimitador_formato);
+				printf("Token: %s\n", nombreFormateado);
+    		}
+			printf("\n impresion nueva: %s", nombreFormateado);
+			nombreCancion = nombreFormateado;
+			printf("\n impresion: %s", token);
+			printf("\n impresion 2: %s", ruta2);
 		}
 
 		//Si el archivo se recibió exitosamente hacemos una copia de seguridad en el servidor 
@@ -224,11 +252,10 @@ int * enviar_bloque_1_1_svc(bloque1 *argp, struct svc_req *rqstp) {
 		crear_archivo_2_2_arg = (char*)malloc(40*sizeof(char));
 		// crear_archivo_2_2_arg = (*argp).nombreArchivo;
 		printf("\n ruta2 : %s", nombreCancion);
-		crear_archivo_2_2_arg = "all_of_me_4917008.mp3";
+		crear_archivo_2_2_arg = nombreCancion;
 		
-
 		#ifndef	DEBUG
-			clnt = clnt_create ("localhost", programa_compartir_canciones, programa_compartir_canciones_version_2, "tcp");
+			clnt = clnt_create ("localhost", programa_compartir_canciones2, programa_compartir_canciones_version_2, "tcp");
 			if (clnt == NULL) {
 				clnt_pcreateerror ("localhost");
 				exit (1);
@@ -240,10 +267,14 @@ int * enviar_bloque_1_1_svc(bloque1 *argp, struct svc_req *rqstp) {
 			if (result_1 == (int *) NULL) {
 				clnt_perror (clnt, "call failed");
 			}else{
+				//TODO enviar la cancion al servidor de respaldo 
 				printf("\n Archivo vacío creado en el servidor");
 				printf("\n Procedimiento a enviar en bloques el archivo");
 				printf("%s ", crear_archivo_2_2_arg);
 				enviarArchivoAlServidor(crear_archivo_2_2_arg, clnt);
+
+				//TODO enviar notificacion al servidor de logs
+				enviarNotificacion();
 			}
 
 			// result_2 = enviar_bloque_2_2(&enviar_bloque_2_2_arg, clnt);
@@ -260,7 +291,7 @@ int * enviar_bloque_1_1_svc(bloque1 *argp, struct svc_req *rqstp) {
 	return &result;
 }
 /**
- * @brief Funcio que simula el comportamiento de un cliente para comunicarse con el 
+ * @brief Funcion que simula el comportamiento de un cliente para comunicarse con el 
  * serividor de respaldo. 
  * 
  * @return int* 1 si es correcto y 0 en caso contrario 

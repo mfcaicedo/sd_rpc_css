@@ -17,7 +17,7 @@
 #endif
 
 static void
-programa_compartir_canciones_2(struct svc_req *rqstp, register SVCXPRT *transp)
+programa_compartir_canciones2_2(struct svc_req *rqstp, register SVCXPRT *transp)
 {
 	union {
 		char *crear_archivo_2_2_arg;
@@ -69,15 +69,15 @@ main (int argc, char **argv)
 {
 	register SVCXPRT *transp;
 
-	pmap_unset (programa_compartir_canciones, programa_compartir_canciones_version_2);
+	pmap_unset (programa_compartir_canciones2, programa_compartir_canciones_version_2);
 
 	transp = svcudp_create(RPC_ANYSOCK);
 	if (transp == NULL) {
 		fprintf (stderr, "%s", "cannot create udp service.");
 		exit(1);
 	}
-	if (!svc_register(transp, programa_compartir_canciones, programa_compartir_canciones_version_2, programa_compartir_canciones_2, IPPROTO_UDP)) {
-		fprintf (stderr, "%s", "unable to register (programa_compartir_canciones, programa_compartir_canciones_version_2, udp).");
+	if (!svc_register(transp, programa_compartir_canciones2, programa_compartir_canciones_version_2, programa_compartir_canciones2_2, IPPROTO_UDP)) {
+		fprintf (stderr, "%s", "unable to register (programa_compartir_canciones2, programa_compartir_canciones_version_2, udp).");
 		exit(1);
 	}
 
@@ -86,8 +86,8 @@ main (int argc, char **argv)
 		fprintf (stderr, "%s", "cannot create tcp service.");
 		exit(1);
 	}
-	if (!svc_register(transp, programa_compartir_canciones, programa_compartir_canciones_version_2, programa_compartir_canciones_2, IPPROTO_TCP)) {
-		fprintf (stderr, "%s", "unable to register (programa_compartir_canciones, programa_compartir_canciones_version_2, tcp).");
+	if (!svc_register(transp, programa_compartir_canciones2, programa_compartir_canciones_version_2, programa_compartir_canciones2_2, IPPROTO_TCP)) {
+		fprintf (stderr, "%s", "unable to register (programa_compartir_canciones2, programa_compartir_canciones_version_2, tcp).");
 		exit(1);
 	}
 

@@ -28,7 +28,7 @@ struct bloque2 {
 typedef struct bloque2 bloque2;
 
 
-#define programa_compartir_canciones 0x20000002
+#define programa_compartir_canciones2 0x20000002
 #define programa_compartir_canciones_version_2 2
 
 #if defined(__STDC__) || defined(__cplusplus)
@@ -38,7 +38,7 @@ extern  int * crear_archivo_2_2_svc(char **, struct svc_req *);
 #define enviar_bloque_2 2
 extern  int * enviar_bloque_2_2(bloque2 *, CLIENT *);
 extern  int * enviar_bloque_2_2_svc(bloque2 *, struct svc_req *);
-extern int programa_compartir_canciones_2_freeresult (SVCXPRT *, xdrproc_t, caddr_t);
+extern int programa_compartir_canciones2_2_freeresult (SVCXPRT *, xdrproc_t, caddr_t);
 
 #else /* K&R C */
 #define crear_archivo_2 1
@@ -47,7 +47,7 @@ extern  int * crear_archivo_2_2_svc();
 #define enviar_bloque_2 2
 extern  int * enviar_bloque_2_2();
 extern  int * enviar_bloque_2_2_svc();
-extern int programa_compartir_canciones_2_freeresult ();
+extern int programa_compartir_canciones2_2_freeresult ();
 #endif /* K&R C */
 
 /* the xdr functions */

@@ -28,7 +28,7 @@ struct bloque2 {
 typedef struct bloque2 bloque2;
 
 
-#define programa_compartir_canciones 0x20000002
+#define programa_compartir_canciones2 0x20000002
 #define programa_compartir_canciones_version_2 2
 
 #if defined(__STDC__) || defined(__cplusplus)
