@@ -18,6 +18,7 @@ struct stat st;
 const char *name = "canciones";
 int tamanio_cancion = 0; 
 int tamanio_bloques = 0;
+int tamanio_mb_canciones = 0;
 
 /**
  * @brief Método para partir una línea 
@@ -56,13 +57,13 @@ const char * get_filename_ext(const char *filename) {
  */
 void enviarArchivoAlServidor(char * nombreArchivo, CLIENT  *clnt){
 
-
 	//fopen abrimos el archivo en modo lectura r 
 	FILE *file = fopen(nombreArchivo, "r");
 	bool bandera = TRUE; 
 	int pos = 0, cantidadBloques = 0; 
 	bloque1 objBloque; 
-	objBloque.nombreArchivo = (char*)malloc(40*sizeof(char));
+	// objBloque.nombreArchivo = (char*)malloc(40*sizeof(char));
+	objBloque.nombreArchivo = (char*)malloc(200);
 	strcpy(objBloque.nombreArchivo, nombreArchivo);
 	objBloque.datos.datos_val = (char *)malloc(TAM_MAX_BLOQUE_ARCHIVO * sizeof(char));
 
@@ -98,15 +99,33 @@ void enviarArchivoAlServidor(char * nombreArchivo, CLIENT  *clnt){
  * 
  */
 void enviarNotificacion(){
-	printf("\n llego a enviar notificacion");
+	printf("\n llego a enviar notificacion: ");
+	int num_canciones_mp3 = 0; 
+	int num_canciones_FLAC = 0;
+	int tamanio_arreglo = sizeof(vectorCanciones);
+	// Memoria ocupada por su primer elemento
+	int tamanio_pos = sizeof(vectorCanciones[0]);
+
+	// División simple
+	int longitud = tamanio_arreglo / tamanio_pos;
+	printf("\n %d", tamanio_arreglo);
+	printf("\n %d", tamanio_pos);
+	printf("\n %d", longitud);
 	//TODO hacer calcular 
 	//1. calcular la cantidad de canciones segun el tipo 
-	// for (size_t i = 0; i < 5; i++){
-	// 	printf("\nNombre: %s", vectorCanciones[i].titulo);
-	// 	printf("\nArtista: %s", vectorCanciones[i].artista);
-	// }
-	
-	//2. calcular el espacio utilizado por todas las canciones 
+	for (size_t i = 0; i < 5; i++){
+		//vertificar el tipo de cancion 
+		if(vectorCanciones[i].titulo != '\0'){
+			printf("\n entra en el if %s", vectorCanciones[i].tipo);
+			if(strcmp(vectorCanciones[i].tipo, "mp3") == 0){
+				num_canciones_mp3++;
+			}else if(strcmp(vectorCanciones[i].tipo, "FLAC") == 0){
+				num_canciones_FLAC++;
+			}	
+		}
+
+	}
+	printf("\n numero cancion: %d ", num_canciones_mp3);
 
 
 }
@@ -129,7 +148,7 @@ bool_t * enviar_datos_cancion_1_1_svc(cancion1 *argp, struct svc_req *rqstp) {
 	printf("\n");
 	
 	//guardo la canción 
-	if(indice != 20){
+	if(indice != 6){
 	vectorCanciones[indice] = *argp;
 	result = TRUE;
 	}else{
@@ -204,8 +223,10 @@ int * enviar_bloque_1_1_svc(bloque1 *argp, struct svc_req *rqstp) {
 		printf("\n Último bloque recibido exitosamente");
 		printf("\n Número de bloques recibidos: %d", tamanio_bloques);
 		
+		//sumar el tamanio a la variable global 
+		tamanio_mb_canciones = tamanio_mb_canciones + tamanio_cancion;
 		//renombramiento de la cancion 
-		int n1 = tamanio_cancion;
+		int n1 = tamanio_cancion; 
 		char *num;
 		char buffer[100];
 		int len2 = strlen("canciones/");
@@ -274,6 +295,7 @@ int * enviar_bloque_1_1_svc(bloque1 *argp, struct svc_req *rqstp) {
 				enviarArchivoAlServidor(crear_archivo_2_2_arg, clnt);
 
 				//TODO enviar notificacion al servidor de logs
+				printf("\n antes de enviar notificacion");
 				enviarNotificacion();
 			}
 
