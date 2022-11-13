@@ -12,7 +12,20 @@
 #include "interface1.h"
 #include "interface2.h"
 #include "interface3.h"
+
+#include <time.h>
+
+//int number = 20;
 cancion1 vectorCanciones[20];
+int vectorMp3[5] = {0};
+int vectorPLC[5] = {0}; 
+int indice2 = 0;
+int numcacnionesMp3 = 0;
+int numcancionFlac= 0;
+
+datos_calculados datos_calculadosObj;
+//cancion1 cancionVacia;
+//memset(vectorCanciones,cancionVacia, );
 int indice = 0;
 struct stat st; 
 const char *name = "canciones";
@@ -100,8 +113,8 @@ void enviarArchivoAlServidor(char * nombreArchivo, CLIENT  *clnt){
  */
 void enviarNotificacion(){
 	printf("\n llego a enviar notificacion: ");
-	int num_canciones_mp3 = 0; 
-	int num_canciones_FLAC = 0;
+	//int num_canciones_mp3 = 0; 
+	//int num_canciones_FLAC = 0;
 	int tamanio_arreglo = sizeof(vectorCanciones);
 	// Memoria ocupada por su primer elemento
 	int tamanio_pos = sizeof(vectorCanciones[0]);
@@ -111,22 +124,79 @@ void enviarNotificacion(){
 	printf("\n %d", tamanio_arreglo);
 	printf("\n %d", tamanio_pos);
 	printf("\n %d", longitud);
-	//TODO hacer calcular 
-	//1. calcular la cantidad de canciones segun el tipo 
-	for (size_t i = 0; i < 5; i++){
-		//vertificar el tipo de cancion 
-		if(vectorCanciones[i].titulo != '\0'){
-			printf("\n entra en el if %s", vectorCanciones[i].tipo);
-			if(strcmp(vectorCanciones[i].tipo, "mp3") == 0){
-				num_canciones_mp3++;
-			}else if(strcmp(vectorCanciones[i].tipo, "FLAC") == 0){
-				num_canciones_FLAC++;
-			}	
+
+	printf("\n numero de canciones mp3 %d", numcacnionesMp3);
+	printf("\n numero de canciones flac %d", numcancionFlac);
+	
+	//traemos la fecha y hora actual
+	time_t t = time(NULL);
+	struct tm tiempoLocal = *localtime(&t);
+
+	char fechaHora[50];
+	char *formato = "%Y-%m-%d %H:%M:%S";
+
+	int bytesEscritos = strftime(fechaHora, sizeof fechaHora, formato, &tiempoLocal);
+
+	if(bytesEscritos != 0){
+		printf("Fecha y Hora: %s", fechaHora);
+	}else{
+		printf("Error al formateo de fecha");
+	}
+
+	//llenamos la estructura 
+	datos_calculadosObj.cantidad_canciones_FLAC= numcancionFlac;
+	datos_calculadosObj.cantidad_canciones_mp3 = numcacnionesMp3;
+	//datos_calculadosObj.espacio_total_canciones = 
+	//datos_calculadosObj.fecha_hora = fechaHora;
+	//datos_calculadosObj.fecha_hora = 
+	strcpy(datos_calculadosObj.fecha_hora, fechaHora);
+	datos_calculadosObj.espacio_total_canciones=1233245;
+
+
+	//imprimimos los datos de la estructura
+	printf("\n cantidad de cacniones FLAC: %d", datos_calculadosObj.cantidad_canciones_FLAC);
+	printf("\n cantidad de cacniones mp3: %d", datos_calculadosObj.cantidad_canciones_mp3);
+	printf("\n espacio total de canciones: %d", datos_calculadosObj.espacio_total_canciones);
+	printf("\n  fecha y hora: %s", datos_calculadosObj.fecha_hora);
+
+	//realizamos el llamado al procedimiento remoto y le pasamos la estructura datos_calculados_obj
+	CLIENT *clnt;
+	int  *result_3;
+	char * crear_archivo_3_3_arg;
+	bloque2  enviar_bloque_2_2_arg;
+	//reservo memoria 
+	crear_archivo_3_3_arg = (char*)malloc(40*sizeof(char));
+	// crear_archivo_2_2_arg = (*argp).nombreArchivo;
+	crear_archivo_3_3_arg = &datos_calculadosObj;
+		
+	#ifndef	DEBUG
+		clnt = clnt_create ("localhost", programa_compartir_canciones2, programa_compartir_canciones_version_2, "tcp");
+		if (clnt == NULL) {
+			clnt_pcreateerror ("localhost");
+			exit (1);
+		}
+	#endif	/* DEBUG */
+		//printf("\n llega hasta antes de crear_archivo_2");
+		result_3 =enviar_notificacion_3_svc(crear_archivo_3_3_arg, clnt);
+		//printf("\n llega hasta despues de crear_archivo_2 %d", result_1);
+		if (result_3 == (int *) NULL) {
+			clnt_perror (clnt, "call failed");
+		}else{
+			printf("se envio la notificacion");
+			//TODO enviar la cancion al servidor de respaldo 
+			//printf("\n Archivo vacío creado en el servidor");
+			//printf("\n Procedimiento a enviar en bloques el archivo");
+			//printf("%s ", crear_archivo_2_2_arg);
+			//enviarArchivoAlServidor(crear_archivo_2_2_arg, clnt);
+
+			//TODO enviar notificacion al servidor de logs
+			//printf("\n antes de enviar notificacion");
+			//enviarNotificacion();
 		}
 
-	}
-	printf("\n numero cancion: %d ", num_canciones_mp3);
-
+		#ifndef	DEBUG
+			clnt_destroy (clnt);
+		#endif	 /* DEBUG */
 
 }
 
@@ -155,6 +225,14 @@ bool_t * enviar_datos_cancion_1_1_svc(cancion1 *argp, struct svc_req *rqstp) {
 		result = FALSE;
 	}
 	indice++;
+
+	//verificamos el tipo de la cancion y aumentamos el contador
+	if(strcmp(argp->tipo, "mp3") == 0){
+		numcacnionesMp3++;
+	}else if(strcmp(argp->tipo, "FLAC") == 0){
+		numcancionFlac++;
+	}
+
 	printf("\n el resultado fue : %B", result);
 	return &result;
 }

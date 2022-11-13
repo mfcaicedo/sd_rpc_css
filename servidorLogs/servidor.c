@@ -11,6 +11,7 @@ enviar_notificacion_3_svc(datos_calculados *argp, struct svc_req *rqstp)
 {
 	static char * result;
 
+	printf("se llamo a la funcion de notificacion");
 	/*
 	 * insert server code here
 	 */
