@@ -5,9 +5,14 @@
  */
 
 #include "interface3.h"
-
-void *
-enviar_notificacion_3_svc(datos_calculados *argp, struct svc_req *rqstp){
+/**
+ * @brief metodo del lado del servidor para recibir la notificación e imprimirla por pantalla. 
+ * 
+ * @param argp estructura con los datos calculados
+ * @param rqstp servicio request 
+ * @return void* 
+ */
+void * enviar_notificacion_3_svc(datos_calculados *argp, struct svc_req *rqstp){
 	static char * result;
 
 	printf("\nNotificacion");
@@ -17,10 +22,6 @@ enviar_notificacion_3_svc(datos_calculados *argp, struct svc_req *rqstp){
 	printf("\nEspacio utilizado por todas las canciones en mb %d", argp->espacio_total_canciones);
 	printf("\n");
 	result = 1;
-
-	/*
-	 * insert server code here
-	 */
 
 	return (void *) &result;
 }

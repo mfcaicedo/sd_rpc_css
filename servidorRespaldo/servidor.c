@@ -12,7 +12,13 @@ struct stat st;
 const char *name = "canciones";
 int tamanio_cancion = 0; 
 int tamanio_bloques = 0;
-
+/**
+ * @brief Metodo del lado del servidor para crear el archivo en la carpeta canciones. 
+ * 
+ * @param argp nombre del archivo. 
+ * @param rqstp servicio request
+ * @return int* 1 si es correcto 0 si es incorrecto
+ */
 int * crear_archivo_2_2_svc(char **argp, struct svc_req *rqstp) {
 	static int  result;
 
@@ -24,27 +30,26 @@ int * crear_archivo_2_2_svc(char **argp, struct svc_req *rqstp) {
         mkdir(name, S_IRWXU); //lo creo con permisos 
         printf("Directorio canciones creado con exito\n");
     }
-
+	//reservo memoria y estructuro la ruta del archivo
 	int len = strlen("canciones/");
     char *ruta = malloc(len + strlen(*argp) + 1);
     sprintf(ruta, "canciones/%s", *argp);
-
-	fopen(ruta, "w");
 	//fopen crea el archivo si no existe y w para escritura
+	fopen(ruta, "w");
 	return &result;
 }
-
+/**
+ * @brief metodo que guarda el archivo a partir de bloques
+ * 
+ * @param argp bloque recibido
+ * @param rqstp servicio request
+ * @return int* 1 correcto | 0 incorrecto
+ */
 int * enviar_bloque_2_2_svc(bloque2 *argp, struct svc_req *rqstp) {
 	static int  result;
 	result = 0; 
 	FILE *file;
-	//abrimos el archivo en modo añadir a -> agrega contenido al final  
-	// int len = strlen("canciones/");
-    // // char *ruta = malloc(len + strlen(argp) + 1);
-	// char *ruta = malloc(100);
-    // sprintf(ruta, "canciones/%s", (*argp).nombreArchivo);
-	// sprintf(ruta, "canciones/%s", "all_of_me_4917008.mp3");
-
+	//abrimos el archivo modo lectura. 
 	file = fopen((*argp).nombreArchivo, "a");
 	if(file == NULL){
 		result = 1;
@@ -53,7 +58,7 @@ int * enviar_bloque_2_2_svc(bloque2 *argp, struct svc_req *rqstp) {
 	fseek(file, (*argp).dest_offset, SEEK_SET);
 	fwrite((*argp).datos.datos_val, 1, (*argp).datos.datos_len, file);
 	fclose(file);
-	//toca ir acumulando los bytes
+	//Se acumula los bytes
 	tamanio_cancion = tamanio_cancion + (*argp).datos.datos_len;
 	tamanio_bloques++;
 
@@ -64,17 +69,12 @@ int * enviar_bloque_2_2_svc(bloque2 *argp, struct svc_req *rqstp) {
 	else if((*argp).datos.datos_len < TAM_MAX_BLOQUE_ARCHIVO){
 		printf("\n Último bloque recibido exitosamente");
 		printf("\n Número de bloques recibidos: %d", tamanio_bloques);
+		printf("\n");
 
 		//renombramiento de la cancion 
-		//ruta inicial de la cancion 
-		// int len2 = strlen("canciones/");
-		// char *ruta2 = malloc(200);
-		// sprintf(ruta2, "canciones/%s", (*argp).nombreArchivo);
-		//renombramiento 
 		int len_ruta = strlen("canciones/copiaSeguridad_");
 		char *nombre_cancion = malloc(len_ruta + strlen(argp) + 1); 
-		//hacemos split del nombre de archivo 
-		//formateo el nombre de la cancion para enviar al servidor de respaldo
+		//formateo el nombre de la cancion
 		char delimitador_formato[] = "/";
 		char * nombre_cancion_original = malloc(200);
 		char *nombre_formateado = strtok((*argp).nombreArchivo, delimitador_formato);
@@ -83,19 +83,13 @@ int * enviar_bloque_2_2_svc(bloque2 *argp, struct svc_req *rqstp) {
 			nombre_formateado = strtok(NULL, delimitador_formato);
 		}
 		nombre_cancion = nombre_formateado;
-		printf("\n nombre despues del split: %s", nombre_cancion);
 
 		//formateo el nombre original 
 		sprintf(nombre_cancion_original, "canciones/%s",nombre_cancion);
 		//formateo el nombre a renombrar la cancion 
 		char *ruta_renombrada = malloc(200);
 		sprintf(ruta_renombrada, "canciones/copiaSeguridad_%s", nombre_cancion);
-		printf("\n ruta_renombrada: %s", ruta_renombrada);
-		printf("\n nombre_archivo: %s",(*argp).nombreArchivo);
-		printf("\n nombre cancion original htpm: %s",nombre_cancion_original);
-		printf("\n");
 		rename(nombre_cancion_original, ruta_renombrada);
-
 	}
 	
 	return &result;

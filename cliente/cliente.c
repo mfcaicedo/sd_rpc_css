@@ -35,7 +35,7 @@ char** split( char** couple, char* tosplit, char* culprit ) {
  * @brief Obtener la extensión de un archivo 
  * 
  * @param filename nombre del archivo 
- * @return const char* retorno. 
+ * @return const char* retorna extesion. 
  */
 const char * get_filename_ext(const char *filename) {
 	const char *dot = strrchr(filename, '.');
@@ -87,9 +87,7 @@ void enviarArchivoAlServidor(char * nombreArchivo, CLIENT  *clnt){
 	}
 }
 
-void
-programa_compartir_canciones_1(char *host)
-{
+void programa_compartir_canciones_1(char *host){
 	CLIENT *clnt;
 	int  *result_1;
 	char * crear_archivo_1_1_arg;
@@ -109,22 +107,18 @@ programa_compartir_canciones_1(char *host)
 	}
 #endif	/* DEBUG */
 
-
 	//declaramos variable para opcion de cliente 
 	int opcion;
-
 	do{
 
 		printf("\n========    Menu    ========= \n");
 		printf("\n   1. Ingresar y enviar datos de una canción ");
-		printf("\n   2. Consultar cancion del servidor ");
+		printf("\n   2. Consultar canción del servidor ");
 		printf("\n   3. Salir ");
 		printf("\n============================\n");
-
 	 	scanf("%d", &opcion);  //leemos la opcion del cliente
 
-		switch (opcion)
-		{
+		switch (opcion){
 		case 1:
 			/* Pedimos los datos de la cancion  */
 			printf("\n Digite el codigo de la cancion: ");
@@ -154,8 +148,6 @@ programa_compartir_canciones_1(char *host)
         		continue; 
     		}
 			//validación la extensión del archivo 
-			// char* couple[2] = {"", ""};
-			// char** strings = split(couple, nombreArchivo, "." );
 			if (strcmp("mp3", get_filename_ext(crear_archivo_1_1_arg)) != 0 && 
 			strcmp("FLAC", get_filename_ext(crear_archivo_1_1_arg)) != 0){
 				printf("\n El archivo no tiene el formato adecuado\n");
@@ -170,7 +162,6 @@ programa_compartir_canciones_1(char *host)
 			}
 			//Enviamos la cancion al servidor si pasa la validaciones
 			result_1 = crear_archivo_1_1(&crear_archivo_1_1_arg, clnt);
-			printf("Result 1 : %d", result_1);
 			if (result_1 == (int *) NULL) {
 				clnt_perror (clnt, "call failed");
 			}else{
@@ -181,9 +172,8 @@ programa_compartir_canciones_1(char *host)
 			break;
 
 		case 2:
-
 			consultar_cancion_1_1_arg = (char*) malloc(40*sizeof(char));
-			printf("\n Digite el titulo de la cancion a buscar ");
+			printf("\n Digite el titulo de la cancion a buscar: ");
 			scanf("%s", consultar_cancion_1_1_arg);
 
 			result_4 = consultar_cancion_1_1(&consultar_cancion_1_1_arg, clnt);
@@ -200,7 +190,6 @@ programa_compartir_canciones_1(char *host)
 			}
 			break;
 		}
-
 	} while(opcion != 3);
 
 	result_2 = enviar_bloque_1_1(&enviar_bloque_1_1_arg, clnt);
@@ -218,17 +207,14 @@ programa_compartir_canciones_1(char *host)
 	clnt_destroy (clnt);
 #endif	 /* DEBUG */
 }
-
 /**
  * @brief Rutina para iniciar el programa 
  * 
  * @param argc numero de argumentos 
- * @param argv arrglo de argumentos 
+ * @param argv arreglo de argumentos 
  * @return int retorno. 
  */
-int
-main (int argc, char *argv[])
-{
+int main (int argc, char *argv[]){
 	char *host;
 
 	if (argc < 2) {
