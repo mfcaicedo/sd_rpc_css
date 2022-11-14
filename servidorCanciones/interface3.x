@@ -8,7 +8,7 @@ struct datos_calculados{
 };
 
 /*Definicion de las operaciones que se pueden realizar*/
-program programa_compartir_canciones {
+program programa_compartir_canciones3 {
 	version programa_compartir_canciones_version_3 {
 		void enviar_notificacion(datos_calculados objdatosCalculados)=1;		
 	}=3;

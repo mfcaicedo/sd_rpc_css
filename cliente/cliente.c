@@ -135,9 +135,11 @@ programa_compartir_canciones_1(char *host)
 
 			printf("\n Digite el autor de la cancion: ");
 			scanf("%s", enviar_datos_cancion_1_1_arg.artista);
-
-			printf("\n Digite el tipo de la canción: ");
+			do{
+			printf("\n Digite el tipo de la canción (mp3, FLAC): ");
 			scanf("%s", enviar_datos_cancion_1_1_arg.tipo);
+			}while ((strcmp(enviar_datos_cancion_1_1_arg.tipo, "mp3") != 0) && 
+			(strcmp(enviar_datos_cancion_1_1_arg.tipo, "FLAC") != 0));
 
 			printf("\n Digite el tamaño de la cancion en mb: ");
 			scanf("%d", &enviar_datos_cancion_1_1_arg.tamanioCancion);
@@ -161,7 +163,6 @@ programa_compartir_canciones_1(char *host)
 			}
 			//registramos los datos de la canción si pasa las validaciones 
 			result_3 = enviar_datos_cancion_1_1(&enviar_datos_cancion_1_1_arg, clnt);
-			printf("hola: %B", result_3);
 			if (result_3 == (bool_t *) NULL) {
 				clnt_perror (clnt, "call failed");
 			}else{
@@ -181,24 +182,23 @@ programa_compartir_canciones_1(char *host)
 
 		case 2:
 
-			// nombreCancion = (char*) malloc(20*sizeof(char));
-			// printf("\n Digite el titulo de la cancion a buscar ");
-			// scanf("%s", nombreCancion);
+			consultar_cancion_1_1_arg = (char*) malloc(40*sizeof(char));
+			printf("\n Digite el titulo de la cancion a buscar ");
+			scanf("%s", consultar_cancion_1_1_arg);
 
-			// result_2 = consultarcancion_1(&nombreCancion, clnt);
-			// if (result_2 == (nodo_cancion *) NULL) {
-			// 	printf("\nLo sentimos, la canción no fue encontrada \n");
-			// 	clnt_perror (clnt, "call failed");
-			// }else{
-			// 	printf("\nResultado de la información\n");
-			// 	printf("\nNombre canción: %s \n", (*result_2).titulo);
-			// 	printf("\nAutor canción: %s \n", (*result_2).autor);
-			// 	printf("\nCódigo canción: %d \n", (*result_2).codigoCancion);
-			// 	printf("\nTipo canción: %s \n", (*result_2).tipo);
-			// 	printf("\nPeso canción: %d \n", (*result_2).peso);
-			// }
+			result_4 = consultar_cancion_1_1(&consultar_cancion_1_1_arg, clnt);
+			if (result_4 == (cancion1 *) NULL) {
+				printf("\nLo sentimos, la canción no fue encontrada");
+				clnt_perror (clnt, "call failed");
+			}else{
+				printf("\nResultado de la consulta");
+				printf("\nCódigo canción: %d", (*result_4).codigoCancion);
+				printf("\nTítulo canción: %s", (*result_4).titulo);
+				printf("\nArtista canción: %s", (*result_4).artista);
+				printf("\nTipo canción: %s", (*result_4).tipo);
+				printf("\nTamaño canción: %d", (*result_4).tamanioCancion);
+			}
 			break;
-
 		}
 
 	} while(opcion != 3);

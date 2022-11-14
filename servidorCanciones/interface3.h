@@ -23,7 +23,7 @@ struct datos_calculados {
 };
 typedef struct datos_calculados datos_calculados;
 
-#define programa_compartir_canciones 0x20000003
+#define programa_compartir_canciones3 0x20000003
 #define programa_compartir_canciones_version_3 3
 
 #if defined(__STDC__) || defined(__cplusplus)

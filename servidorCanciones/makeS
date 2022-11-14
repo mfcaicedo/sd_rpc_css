@@ -7,7 +7,7 @@ CLIENT =
 SERVER = servidor
 
 SOURCES_CLNT.c = 
-SOURCES_CLNT.h = interface2.h
+SOURCES_CLNT.h = interface2.h interface3.h
 SOURCES_SVC.c = servidor.c
 SOURCES_SVC.h = interface1.h
 SOURCES.x = interface1.x
@@ -15,8 +15,8 @@ SOURCES.x = interface1.x
 # TARGETS_SVC.c = interface1_svc.c   interface1_xdr.c 
 # TARGETS_CLNT.c =     interface1_xdr.c 
 # TARGETS = interface1.h interface1_xdr.c   interface1_svc.c   
-TARGETS_SVC.c = interface1_svc.c interface2_clnt.c interface1_xdr.c interface2_xdr.c
-TARGETS_CLNT.c =     interface2_clnt.c interface1_xdr.c interface2_xdr.c
+TARGETS_SVC.c = interface1_svc.c interface2_clnt.c interface1_xdr.c interface2_xdr.c interface3_clnt.c interface3_xdr.c
+TARGETS_CLNT.c =     interface2_clnt.c interface3_clnt.c interface1_xdr.c interface2_xdr.c interface3_xdr.c
 TARGETS =   interface1_svc.c interface1_xdr.c
 
 OBJECTS_CLNT = $(SOURCES_CLNT.c:%.c=%.o) $(TARGETS_CLNT.c:%.c=%.o)

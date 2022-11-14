@@ -39,13 +39,13 @@ int * enviar_bloque_2_2_svc(bloque2 *argp, struct svc_req *rqstp) {
 	result = 0; 
 	FILE *file;
 	//abrimos el archivo en modo añadir a -> agrega contenido al final  
-	int len = strlen("canciones/");
-    // char *ruta = malloc(len + strlen(argp) + 1);
-	char *ruta = malloc(100);
-    sprintf(ruta, "canciones/%s", (*argp).nombreArchivo);
+	// int len = strlen("canciones/");
+    // // char *ruta = malloc(len + strlen(argp) + 1);
+	// char *ruta = malloc(100);
+    // sprintf(ruta, "canciones/%s", (*argp).nombreArchivo);
 	// sprintf(ruta, "canciones/%s", "all_of_me_4917008.mp3");
 
-	file = fopen(ruta, "a");
+	file = fopen((*argp).nombreArchivo, "a");
 	if(file == NULL){
 		result = 1;
 	}
@@ -67,15 +67,34 @@ int * enviar_bloque_2_2_svc(bloque2 *argp, struct svc_req *rqstp) {
 
 		//renombramiento de la cancion 
 		//ruta inicial de la cancion 
-		int len2 = strlen("canciones/");
-		char *ruta2 = malloc(100);
-		sprintf(ruta2, "canciones/%s", (*argp).nombreArchivo);
+		// int len2 = strlen("canciones/");
+		// char *ruta2 = malloc(200);
+		// sprintf(ruta2, "canciones/%s", (*argp).nombreArchivo);
 		//renombramiento 
 		int len_ruta = strlen("canciones/copiaSeguridad_");
-		char *ruta_renombrada = malloc(100);
-		sprintf(ruta_renombrada, "canciones/copiaSeguridad_%s", (*argp).nombreArchivo);
-		//concatenacion para el nombre nuevo de la cancion 
-		rename(ruta2, ruta_renombrada);
+		char *nombre_cancion = malloc(len_ruta + strlen(argp) + 1); 
+		//hacemos split del nombre de archivo 
+		//formateo el nombre de la cancion para enviar al servidor de respaldo
+		char delimitador_formato[] = "/";
+		char * nombre_cancion_original = malloc(200);
+		char *nombre_formateado = strtok((*argp).nombreArchivo, delimitador_formato);
+		if(nombre_formateado != NULL){
+			// Sólo en la primera pasamos la cadena; en las siguientes pasamos NULL
+			nombre_formateado = strtok(NULL, delimitador_formato);
+		}
+		nombre_cancion = nombre_formateado;
+		printf("\n nombre despues del split: %s", nombre_cancion);
+
+		//formateo el nombre original 
+		sprintf(nombre_cancion_original, "canciones/%s",nombre_cancion);
+		//formateo el nombre a renombrar la cancion 
+		char *ruta_renombrada = malloc(200);
+		sprintf(ruta_renombrada, "canciones/copiaSeguridad_%s", nombre_cancion);
+		printf("\n ruta_renombrada: %s", ruta_renombrada);
+		printf("\n nombre_archivo: %s",(*argp).nombreArchivo);
+		printf("\n nombre cancion original htpm: %s",nombre_cancion_original);
+		printf("\n");
+		rename(nombre_cancion_original, ruta_renombrada);
 
 	}
 	

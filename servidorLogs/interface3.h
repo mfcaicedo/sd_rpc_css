@@ -23,20 +23,20 @@ struct datos_calculados {
 };
 typedef struct datos_calculados datos_calculados;
 
-#define programa_compartir_canciones 0x20000003
+#define programa_compartir_canciones3 0x20000003
 #define programa_compartir_canciones_version_3 3
 
 #if defined(__STDC__) || defined(__cplusplus)
 #define enviar_notificacion 1
 extern  void * enviar_notificacion_3(datos_calculados *, CLIENT *);
 extern  void * enviar_notificacion_3_svc(datos_calculados *, struct svc_req *);
-extern int programa_compartir_canciones_3_freeresult (SVCXPRT *, xdrproc_t, caddr_t);
+extern int programa_compartir_canciones3_3_freeresult (SVCXPRT *, xdrproc_t, caddr_t);
 
 #else /* K&R C */
 #define enviar_notificacion 1
 extern  void * enviar_notificacion_3();
 extern  void * enviar_notificacion_3_svc();
-extern int programa_compartir_canciones_3_freeresult ();
+extern int programa_compartir_canciones3_3_freeresult ();
 #endif /* K&R C */
 
 /* the xdr functions */

@@ -12,19 +12,16 @@
 #include "interface1.h"
 #include "interface2.h"
 #include "interface3.h"
-
 #include <time.h>
 
-//int number = 20;
 cancion1 vectorCanciones[20];
 int vectorMp3[5] = {0};
 int vectorPLC[5] = {0}; 
 int indice2 = 0;
-int numcacnionesMp3 = 0;
+int numcancionesMp3 = 0;
 int numcancionFlac= 0;
 
 datos_calculados datos_calculadosObj;
-//cancion1 cancionVacia;
 //memset(vectorCanciones,cancionVacia, );
 int indice = 0;
 struct stat st; 
@@ -69,23 +66,23 @@ const char * get_filename_ext(const char *filename) {
  * @param clnt referencia del cliente que enviará el archivo al servidor. 
  */
 void enviarArchivoAlServidor(char * nombreArchivo, CLIENT  *clnt){
-
 	//fopen abrimos el archivo en modo lectura r 
 	FILE *file = fopen(nombreArchivo, "r");
 	bool bandera = TRUE; 
 	int pos = 0, cantidadBloques = 0; 
-	bloque1 objBloque; 
+	bloque2 objBloque; 
 	// objBloque.nombreArchivo = (char*)malloc(40*sizeof(char));
 	objBloque.nombreArchivo = (char*)malloc(200);
 	strcpy(objBloque.nombreArchivo, nombreArchivo);
-	objBloque.datos.datos_val = (char *)malloc(TAM_MAX_BLOQUE_ARCHIVO * sizeof(char));
-
+	objBloque.datos.datos_val = (char *)malloc(TAM_MAX_BLOQUE_ARCHIVO * sizeof(char)* 400);
+	
 	do{
-	//la funcion fread lee 1024 bytes del archivo 
-	//los guarda en el campo datos_val del campo datos, de la variable objBLoque
+		//la funcion fread lee 1024 bytes del archivo 
+		//los guarda en el campo datos_val del campo datos, de la variable objBLoque
 		objBloque.datos.datos_len = fread(objBloque.datos.datos_val, 1, TAM_MAX_BLOQUE_ARCHIVO, file);
 		//el campo dest_offset almacena la posición desde la cual se realizar la lectura de los 1024 bytes
 		objBloque.dest_offset = pos; 
+
 		pos = pos + objBloque.datos.datos_len; 
 
 		int *resultado = enviar_bloque_2_2(&objBloque, clnt);
@@ -113,21 +110,7 @@ void enviarArchivoAlServidor(char * nombreArchivo, CLIENT  *clnt){
  */
 void enviarNotificacion(){
 	printf("\n llego a enviar notificacion: ");
-	//int num_canciones_mp3 = 0; 
-	//int num_canciones_FLAC = 0;
-	int tamanio_arreglo = sizeof(vectorCanciones);
-	// Memoria ocupada por su primer elemento
-	int tamanio_pos = sizeof(vectorCanciones[0]);
 
-	// División simple
-	int longitud = tamanio_arreglo / tamanio_pos;
-	printf("\n %d", tamanio_arreglo);
-	printf("\n %d", tamanio_pos);
-	printf("\n %d", longitud);
-
-	printf("\n numero de canciones mp3 %d", numcacnionesMp3);
-	printf("\n numero de canciones flac %d", numcancionFlac);
-	
 	//traemos la fecha y hora actual
 	time_t t = time(NULL);
 	struct tm tiempoLocal = *localtime(&t);
@@ -145,19 +128,15 @@ void enviarNotificacion(){
 
 	//llenamos la estructura 
 	datos_calculadosObj.cantidad_canciones_FLAC= numcancionFlac;
-	datos_calculadosObj.cantidad_canciones_mp3 = numcacnionesMp3;
-	//datos_calculadosObj.espacio_total_canciones = 
-	//datos_calculadosObj.fecha_hora = fechaHora;
-	//datos_calculadosObj.fecha_hora = 
+	datos_calculadosObj.cantidad_canciones_mp3 = numcancionesMp3;
 	strcpy(datos_calculadosObj.fecha_hora, fechaHora);
-	datos_calculadosObj.espacio_total_canciones=1233245;
-
+	datos_calculadosObj.espacio_total_canciones = tamanio_mb_canciones;
 
 	//imprimimos los datos de la estructura
 	printf("\n cantidad de cacniones FLAC: %d", datos_calculadosObj.cantidad_canciones_FLAC);
 	printf("\n cantidad de cacniones mp3: %d", datos_calculadosObj.cantidad_canciones_mp3);
 	printf("\n espacio total de canciones: %d", datos_calculadosObj.espacio_total_canciones);
-	printf("\n  fecha y hora: %s", datos_calculadosObj.fecha_hora);
+	printf("\n fecha y hora: %s", datos_calculadosObj.fecha_hora);
 
 	//realizamos el llamado al procedimiento remoto y le pasamos la estructura datos_calculados_obj
 	CLIENT *clnt;
@@ -165,33 +144,26 @@ void enviarNotificacion(){
 	char * crear_archivo_3_3_arg;
 	bloque2  enviar_bloque_2_2_arg;
 	//reservo memoria 
-	crear_archivo_3_3_arg = (char*)malloc(40*sizeof(char));
+	crear_archivo_3_3_arg = (char*)malloc(50*sizeof(char));
 	// crear_archivo_2_2_arg = (*argp).nombreArchivo;
 	crear_archivo_3_3_arg = &datos_calculadosObj;
 		
 	#ifndef	DEBUG
-		clnt = clnt_create ("localhost", programa_compartir_canciones2, programa_compartir_canciones_version_2, "tcp");
+		clnt = clnt_create ("localhost", programa_compartir_canciones3, programa_compartir_canciones_version_3, "udp");
 		if (clnt == NULL) {
 			clnt_pcreateerror ("localhost");
 			exit (1);
 		}
 	#endif	/* DEBUG */
 		//printf("\n llega hasta antes de crear_archivo_2");
-		result_3 =enviar_notificacion_3_svc(crear_archivo_3_3_arg, clnt);
+		// result_3 =enviar_notificacion_3_svc(crear_archivo_3_3_arg, clnt);
+		result_3 = enviar_notificacion_3(crear_archivo_3_3_arg, clnt);
 		//printf("\n llega hasta despues de crear_archivo_2 %d", result_1);
+		printf("\n result_3 %d", result_3);
 		if (result_3 == (int *) NULL) {
 			clnt_perror (clnt, "call failed");
 		}else{
 			printf("se envio la notificacion");
-			//TODO enviar la cancion al servidor de respaldo 
-			//printf("\n Archivo vacío creado en el servidor");
-			//printf("\n Procedimiento a enviar en bloques el archivo");
-			//printf("%s ", crear_archivo_2_2_arg);
-			//enviarArchivoAlServidor(crear_archivo_2_2_arg, clnt);
-
-			//TODO enviar notificacion al servidor de logs
-			//printf("\n antes de enviar notificacion");
-			//enviarNotificacion();
 		}
 
 		#ifndef	DEBUG
@@ -228,7 +200,7 @@ bool_t * enviar_datos_cancion_1_1_svc(cancion1 *argp, struct svc_req *rqstp) {
 
 	//verificamos el tipo de la cancion y aumentamos el contador
 	if(strcmp(argp->tipo, "mp3") == 0){
-		numcacnionesMp3++;
+		numcancionesMp3++;
 	}else if(strcmp(argp->tipo, "FLAC") == 0){
 		numcancionFlac++;
 	}
@@ -325,23 +297,19 @@ int * enviar_bloque_1_1_svc(bloque1 *argp, struct svc_req *rqstp) {
 			strcat(token, ".mp3");
 			rename(ruta2, token);
 			free(num);
+			//limpio la varible global del tamanio de la cancion 
+			tamanio_cancion = 0;
 			//formateo el nombre de la cancion para enviar al servidor de respaldo
 			char delimitador_formato[] = "/";
 			char *nombreFormateado = strtok(token, delimitador_formato);
 			if(nombreFormateado != NULL){
 				// Sólo en la primera pasamos la cadena; en las siguientes pasamos NULL
 				nombreFormateado = strtok(NULL, delimitador_formato);
-				printf("Token: %s\n", nombreFormateado);
     		}
-			printf("\n impresion nueva: %s", nombreFormateado);
 			nombreCancion = nombreFormateado;
-			printf("\n impresion: %s", token);
-			printf("\n impresion 2: %s", ruta2);
 		}
-
 		//Si el archivo se recibió exitosamente hacemos una copia de seguridad en el servidor 
 		//de respaldo 
-		
 		CLIENT *clnt;
 		int  *result_1;
 		char * crear_archivo_2_2_arg;
@@ -350,8 +318,13 @@ int * enviar_bloque_1_1_svc(bloque1 *argp, struct svc_req *rqstp) {
 		//reservo memoria 
 		crear_archivo_2_2_arg = (char*)malloc(40*sizeof(char));
 		// crear_archivo_2_2_arg = (*argp).nombreArchivo;
-		printf("\n ruta2 : %s", nombreCancion);
 		crear_archivo_2_2_arg = nombreCancion;
+		//formatemos el nombre del archivo para enviarlo al servidor de respaldo
+		char * nombre_formateado;
+		nombre_formateado = malloc(300);
+		
+		sprintf(nombre_formateado, "canciones/%s", crear_archivo_2_2_arg);
+		crear_archivo_2_2_arg = nombre_formateado;
 		
 		#ifndef	DEBUG
 			clnt = clnt_create ("localhost", programa_compartir_canciones2, programa_compartir_canciones_version_2, "tcp");
@@ -360,9 +333,7 @@ int * enviar_bloque_1_1_svc(bloque1 *argp, struct svc_req *rqstp) {
 				exit (1);
 			}
 		#endif	/* DEBUG */
-			printf("\n llega hasta antes de crear_archivo_2");
 			result_1 = crear_archivo_2_2(&crear_archivo_2_2_arg, clnt);
-			printf("\n llega hasta despues de crear_archivo_2 %d", result_1);
 			if (result_1 == (int *) NULL) {
 				clnt_perror (clnt, "call failed");
 			}else{
@@ -377,12 +348,6 @@ int * enviar_bloque_1_1_svc(bloque1 *argp, struct svc_req *rqstp) {
 				enviarNotificacion();
 			}
 
-			// result_2 = enviar_bloque_2_2(&enviar_bloque_2_2_arg, clnt);
-			// if (result_2 == (int *) NULL) {
-			// 	clnt_perror (clnt, "call failed");
-			// }else{
-			// 	printf("\n No se pudo enviar el archivo al servidor de respaldo");	
-			// }
 		#ifndef	DEBUG
 			clnt_destroy (clnt);
 		#endif	 /* DEBUG */
@@ -397,16 +362,13 @@ int * enviar_bloque_1_1_svc(bloque1 *argp, struct svc_req *rqstp) {
  * @return int* 1 si es correcto y 0 en caso contrario 
  */
 int crear_archivo_servidor_respaldo(){
-	printf("/holi ");
 	static int  result_response;
-
 	static char * result;
 	CLIENT *clnt;
 	int  *result_1;
 	int  notificacion;
 
 	printf("\n Enviando cancion al servidor de respaldo");
-
 	#ifndef	DEBUG
 	clnt = clnt_create ("localhost", programa_compartir_canciones, programa_compartir_canciones_version_2, "tcp");
 	if (clnt == NULL) {
@@ -414,30 +376,9 @@ int crear_archivo_servidor_respaldo(){
 		exit (1);
 	}
 	#endif	/* DEBUG */
-	
 	//Enviamos la cancion al servidor de respaldo
 	result_1 = crear_archivo_2_2("nombre prueba", clnt);
-	/*if (result_1 == (int *) NULL) {
-		clnt_perror (clnt, "call failed");
-	}else if(*result_1 == TRUE){
-		printf("\n Archivo vacío creado en el servidor");
-		printf("\n Procedimiento a enviar en bloques el archivo");
-		enviarArchivoAlServidor(crear_archivo_1_1_arg, clnt);
-	}else{
-		printf("\n Error al registrar la cancion");
-	}*/
-	
-	
-	// #ifndef	DEBUG
-		// clnt_destroy (clnt);
-	// #endif	 /* DEBUG */
-
-	// return (void *) &result;
-	// static int  result;
-
 	result_response = 1;
-
-
 	return result_response; 
 }
 
@@ -447,6 +388,19 @@ cancion1 * consultar_cancion_1_1_svc(char **argp, struct svc_req *rqstp) {
 	/*
 	 * insert server code here
 	 */
+	printf("\nInvocando a consultar canción");
+	printf("\nNombre (título) de la canción a consultar: %s", *argp);	
+	printf("\n");
 
-	return &result;
+	for (int i = 0; i < 5; i++){
+		printf("comparar: %s", vectorCanciones[i].titulo);
+		if (strcmp(vectorCanciones[i].titulo, *argp) == 0){
+			printf("\nLa canción %s fue encontrada :-)", vectorCanciones[i].titulo);
+			result = vectorCanciones[i];
+			return &result;
+		}
+	}
+	return NULL;
+
+	// return &result;
 }

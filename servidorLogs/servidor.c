@@ -7,11 +7,17 @@
 #include "interface3.h"
 
 void *
-enviar_notificacion_3_svc(datos_calculados *argp, struct svc_req *rqstp)
-{
+enviar_notificacion_3_svc(datos_calculados *argp, struct svc_req *rqstp){
 	static char * result;
 
-	printf("se llamo a la funcion de notificacion");
+	printf("\nNotificacion");
+	printf("\nFecha y hora del registro de la cancion: %s", argp->fecha_hora);
+	printf("\nCantidad de canciones tipo .mp3 registradas%d", argp->cantidad_canciones_mp3);
+	printf("\nCantidad de canciones tipo .FLAC registradas %d", argp->cantidad_canciones_FLAC);
+	printf("\nEspacio utilizado por todas las canciones en mb %d", argp->espacio_total_canciones);
+	printf("\n");
+	result = 1;
+
 	/*
 	 * insert server code here
 	 */
